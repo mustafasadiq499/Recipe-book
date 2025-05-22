@@ -1,0 +1,157 @@
+import { useState } from 'react'
+import { Trash, Plus, Check } from 'lucide-react'
+import { Button } from "/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "/components/ui/card"
+import { Input } from "/components/ui/input"
+import { Textarea } from "/components/ui/textarea"
+import { Label } from "/components/ui/label"
+
+type Recipe = {
+  id: string
+  title: string
+  ingredients: string
+  instructions: string
+}
+
+export default function RecipeApp() {
+  const [recipes, setRecipes] = useState<Recipe[]>([])
+  const [title, setTitle] = useState('')
+  const [ingredients, setIngredients] = useState('')
+  const [instructions, setInstructions] = useState('')
+  const [showSuccess, setShowSuccess] = useState(false)
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!title.trim() || !ingredients.trim() || !instructions.trim()) return
+    
+    const newRecipe: Recipe = {
+      id: Date.now().toString(),
+      title,
+      ingredients,
+      instructions
+    }
+    
+    setRecipes([...recipes, newRecipe])
+    setTitle('')
+    setIngredients('')
+    setInstructions('')
+    setShowSuccess(true)
+    
+    setTimeout(() => setShowSuccess(false), 2000)
+  }
+
+  const deleteRecipe = (id: string) => {
+    setRecipes(recipes.filter(recipe => recipe.id !== id))
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold text-center mb-8">Recipe Storage App</h1>
+        
+        {/* Add Recipe Form */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Add New Recipe</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="title">Title</Label>
+                <Input
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Recipe title"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="ingredients">Ingredients</Label>
+                <Textarea
+                  id="ingredients"
+                  value={ingredients}
+                  onChange={(e) => setIngredients(e.target.value)}
+                  placeholder="List ingredients (separate with commas or new lines)"
+                  rows={3}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="instructions">Instructions</Label>
+                <Textarea
+                  id="instructions"
+                  value={instructions}
+                  onChange={(e) => setInstructions(e.target.value)}
+                  placeholder="Step-by-step instructions"
+                  rows={5}
+                />
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Button type="submit" className="gap-2">
+                  <Plus size={16} /> Add Recipe
+                </Button>
+                
+                {showSuccess && (
+                  <div className="flex items-center text-green-600 gap-1">
+                    <Check size={16} />
+                    <span>Recipe added!</span>
+                  </div>
+                )}
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+        
+        {/* Recipe List */}
+        <div className="space-y-6">
+          <h2 className="text-2xl font-semibold">Your Recipes ({recipes.length})</h2>
+          
+          {recipes.length === 0 ? (
+            <p className="text-gray-500">No recipes yet. Add your first recipe above!</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {recipes.map(recipe => (
+                <Card key={recipe.id} className="relative">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute top-2 right-2 text-red-500 hover:text-red-600"
+                    onClick={() => deleteRecipe(recipe.id)}
+                  >
+                    <Trash size={16} />
+                  </Button>
+                  
+                  <CardHeader>
+                    <CardTitle>{recipe.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <h3 className="font-medium mb-2">Ingredients</h3>
+                      <ul className="list-disc pl-5 space-y-1">
+                        {recipe.ingredients.split('\n').map((ingredient, i) => (
+                          <li key={i}>{ingredient}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div>
+                      <h3 className="font-medium mb-2">Instructions</h3>
+                      <ol className="list-decimal pl-5 space-y-1">
+                        {recipe.instructions.split('\n').map((step, i) => (
+                          <li key={i}>{step}</li>
+                        ))}
+                      </ol>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
