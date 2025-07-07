@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Recipe Book</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 700px;
+      margin: 30px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    form input, form textarea, form button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 1rem;
+    }
+
+    form button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    form button:hover {
+      background-color: #218838;
+    }
+
+    .recipe {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-top: 15px;
+      border-radius: 8px;
+      background-color: #fafafa;
+    }
+
+    .recipe h3 {
+      margin-top: 0;
+    }
+
+    .recipe button {
+      margin-right: 10px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>My Recipe Book</h1>
+
+    <form id="recipe-form">
+      <input type="text" id="title" placeholder="Recipe Title" required />
+      <textarea id="ingredients" placeholder="Ingredients" required></textarea>
+      <textarea id="instructions" placeholder="Instructions" required></textarea>
+      <button type="submit">Add Recipe</button>
+    </form>
+
+    <h2>Saved Recipes</h2>
+    <div id="recipes-list"></div>
+  </div>
+
+  <script>
+    let recipes = [];
+
+    const form = document.getElementById('recipe-form');
+    const list = document.getElementById('recipes-list');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const title = document.getElementById('title').value;
+      const ingredients = document.getElementById('ingredients').value;
+      const instructions = document.getElementById('instructions').value;
+
+      const recipe = { title, ingredients, instructions };
+      recipes.push(recipe);
+
+      form.reset();
+      renderRecipes();
+    });
+
+    function renderRecipes() {
+      list.innerHTML = '';
+      recipes.forEach((recipe, index) => {
+        const div = document.createElement('div');
+        div.className = 'recipe';
+        div.innerHTML = `
+          <h3>${recipe.title}</h3>
+          <p><strong>Ingredients:</strong><br>${recipe.ingredients}</p>
+          <p><strong>Instructions:</strong><br>${recipe.instructions}</p>
+          <button onclick="editRecipe(${index})">Edit</button>
+          <button onclick="deleteRecipe(${index})">Delete</button>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function deleteRecipe(index) {
+      recipes.splice(index, 1);
+      renderRecipes();
+    }
+
+    function editRecipe(index) {
+      const recipe = recipes[index];
+      document.getElementById('title').value = recipe.title;
+      document.getElementById('ingredients').value = recipe.ingredients;
+      document.getElementById('instructions').value = recipe.instructions;
+
+      recipes.splice(index, 1);
+      renderRecipes();
+    }
+  </script>
+</body>
+</html>
